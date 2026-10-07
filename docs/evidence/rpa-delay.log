@@ -1,0 +1,9 @@
+INFO Query DEMO0001 delay_ms=1200 timeout_ms=3000
+ERROR Failed at DEMO0001: DEMO0001：查詢結果尚未可用，data-state=loading。
+Traceback (most recent call last):
+  File "<workshop>\rpa\cli.py", line 61, in main
+    record = query_status(page, current_id, args.timeout_ms)
+  File "<workshop>\rpa\track_mail.py", line 13, in query_status
+    raise RuntimeError(f"{mail_id}：查詢結果尚未可用，data-state={state}。")
+RuntimeError: DEMO0001：查詢結果尚未可用，data-state=loading。
+INFO Failure screenshot: outputs\delay.png

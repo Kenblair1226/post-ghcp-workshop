@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}郵務寄件作業小幫手{% endblock %}</title>
+  {% include "_theme.html" %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='common.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <p class="eyebrow">GITHUB COPILOT · LOCAL WORKSHOP</p>
+    <nav aria-label="主要導覽">
+      <a href="/">寄件試算</a>
+      <a href="/tracking">模擬郵件查詢</a>
+    </nav>
+  </header>
+  <main>{% block content %}{% endblock %}</main>
+  <footer>教學環境 · 全部資料與費率均為虛構 · 非正式郵務系統</footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

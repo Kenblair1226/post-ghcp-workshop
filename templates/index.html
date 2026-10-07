@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+{% endblock %}
+{% block content %}
+<section class="quote-card">
+  <h1>寄件費用試算</h1>
+  <p>輸入重量並選擇服務，取得教學用報價。</p>
+  <form id="quote-form">
+    <input id="weight" name="weight" type="number" placeholder="重量">
+    <select id="service" name="service" aria-label="寄送服務">
+      <option value="standard">一般</option>
+      <option value="registered">掛號</option>
+      <!-- service-options -->
+    </select>
+    <button id="submit-button" type="submit">試算</button>
+  </form>
+  <p id="error" role="alert"></p>
+  <p id="result"></p>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}模擬郵件查詢 · RPA Lab{% endblock %}
+{% block content %}
+<section class="tracking-card">
+  <h1>模擬郵件查詢</h1>
+  <p class="hint">可查詢 DEMO0001、DEMO0002、DEMO0003。這是獨立的 RPA 練習頁。</p>
+  <form id="tracking-form" class="tracking-form">
+    <label for="mail-id">虛構郵件編號
+      <input id="mail-id" name="mail-id" required autocomplete="off" value="DEMO0001">
+    </label>
+    <button type="submit">查詢</button>
+  </form>
+  <p id="query-message" role="status" aria-live="polite">請輸入郵件編號。</p>
+  <div data-testid="query-result" data-state="idle" class="table-wrap">
+    <table hidden>
+      <thead><tr><th scope="col">郵件編號</th><th scope="col">寄送服務</th><th scope="col">目前狀態</th></tr></thead>
+      <tbody><tr>
+        <td data-testid="mail-id"></td>
+        <td data-testid="mail-service"></td>
+        <td data-testid="mail-status"></td>
+      </tr></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='tracking.js') }}" defer></script>
+{% endblock %}

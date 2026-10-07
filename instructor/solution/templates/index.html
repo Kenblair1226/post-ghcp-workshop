@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+{% endblock %}
+{% block content %}
+<section class="quote-card" aria-labelledby="quote-title">
+  <p class="eyebrow">01 / 寄件試算</p>
+  <h1 id="quote-title">先確認費用，再安排寄件。</h1>
+  <p class="hint">僅供練習的試算，不代表正式費率。</p>
+  <form id="quote-form" novalidate>
+    <fieldset id="quote-fields">
+      <legend>寄件資訊</legend>
+      <div class="field">
+        <label for="weight">包裹重量（公克）</label>
+        <input id="weight" name="weight" type="text" inputmode="numeric"
+               autocomplete="off" aria-describedby="weight-hint weight-error">
+        <p id="weight-hint" class="hint">輸入 1–20,000 的整數，例如 1000。</p>
+        <p id="weight-error" class="field-error" role="alert"></p>
+      </div>
+      <div class="field">
+        <label for="service">寄送服務</label>
+        <select id="service" name="service" aria-describedby="service-error">
+          <option value="standard">一般（不加價）</option>
+          <option value="registered">掛號（加 20 元）</option>
+          <option value="express">快捷（加 30 元）</option>
+        </select>
+        <p id="service-error" class="field-error" role="alert"></p>
+      </div>
+      <button id="submit-button" type="submit">試算費用</button>
+    </fieldset>
+  </form>
+  <p id="error" role="alert"></p>
+  <p id="progress" role="status" aria-live="polite"></p>
+  <div class="result-panel">
+    <p class="hint">本次試算</p>
+    <p id="result" role="status" aria-live="polite">尚未試算</p>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='app.js') }}" defer></script>
+{% endblock %}

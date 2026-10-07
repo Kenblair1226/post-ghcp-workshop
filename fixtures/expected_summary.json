@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "records": [
+    {"mail_id": "DEMO0001", "status": "已投遞"},
+    {"mail_id": "DEMO0002", "status": "運送中"},
+    {"mail_id": "DEMO0003", "status": "待領取"}
+  ]
+}

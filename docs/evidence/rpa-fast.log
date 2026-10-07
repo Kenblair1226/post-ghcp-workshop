@@ -1,0 +1,11 @@
+INFO Query DEMO0001 delay_ms=0 timeout_ms=3000
+INFO Read DEMO0001 status=掛號
+INFO Query DEMO0002 delay_ms=0 timeout_ms=3000
+INFO Read DEMO0002 status=一般
+INFO Query DEMO0003 delay_ms=0 timeout_ms=3000
+INFO Read DEMO0003 status=快捷
+INFO Summary written: outputs\fast.json
+
+FAIL: Output differs from the expected fixture.
+Expected: {"ok": true, "records": [{"mail_id": "DEMO0001", "status": "已投遞"}, {"mail_id": "DEMO0002", "status": "運送中"}, {"mail_id": "DEMO0003", "status": "待領取"}]}
+Actual:   {"ok": true, "records": [{"mail_id": "DEMO0001", "status": "掛號"}, {"mail_id": "DEMO0002", "status": "一般"}, {"mail_id": "DEMO0003", "status": "快捷"}]}

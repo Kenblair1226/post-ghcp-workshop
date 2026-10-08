@@ -1,4 +1,4 @@
-# 講師手冊（不發給學員）
+# 講師手冊（學員與 Copilot 練習時不讀取）
 
 ## 帶課策略
 
@@ -6,43 +6,50 @@
 
 不是比賽讓 AI 產生最多程式，而是讓學員展示「提供需求 → 審閱產物 → 用獨立證據驗證」。Copilot 的輸出不固定，評分依需求與結果，不要求與講師解答逐字一致。
 
-## 發放教材
+## 取得教材與按需救援
+
+提供 repository 網址 `https://github.com/Kenblair1226/post-ghcp-workshop` 與 [環境手冊](../docs/setup.md)，學員直接 clone 並在根目錄開始，不需講師先打包或發放 ZIP。課程設計與教學缺陷說明移至 [design.md](design.md)，根目錄 README 為學員入口。
+
+`instructor/` 仍會隨 clone 取得。明確要求學員與 Copilot 不讀取、搜尋或附加此目錄，以及其他救援副本或 `dist/`；只處理指定 Lab 的檔案。這是操作規範，不是存取隔離，也不保證 Copilot 不會取得答案。
+
+正常課程沿用學員自己的專案。只有卡關或講師示範時，才建立單一救援副本；這不是開課前置步驟，也不產生 ZIP 或校驗清單。
 
 在 repository 根目錄執行：
 
 ```powershell
 $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
-& $Python scripts\export_materials.py --output dist\workshop
+& $Python instructor\checkpoints.py --stage lab2-ui --output C:\Workshop\lab2-ui
 ```
 
-每個 ZIP 包含單一完整資料夾、學員 README、規格、操作手冊、作業單、程式與測試，另含 `AGENTS.md`、預定義客製化設定及選做手冊。`SHA256.json` 提供封裝檔校驗值。程式以白名單匯出，不包含 repository 根目錄的講師設計說明、`instructor`、虛擬環境或 `.git`，也不會把整個 `.github` 無差別發給學員。
+工具以目前工作目錄中的教材建立獨立資料夾，包含 README、規格、操作手冊、作業單、程式、測試、`AGENTS.md` 與預定義客製化設定；不複製 `instructor`、虛擬環境、`.git` 或其他驗證輸出。它不會還原已被修改的起始程式，講師應以未做練習的乾淨 clone 建立標準救援副本與驗證教材。目的地必須不存在，避免覆寫作業。
 
-| ZIP | 用途 | 預設測試 |
+| `--stage` | 用途 | 乾淨起始版本的預設測試 |
 |---|---|---|
-| `lab1-start.zip` | 正常開場；一般／掛號，尚無快捷 | 19 通過 |
-| `lab1-review.zip` | Coding 卡關救援；快捷已完成，附 coding.diff | 19 通過 |
-| `lab1-tests.zip` | Review 卡關救援；附已確認問題，尚未補測試 | 19 通過 |
-| `lab2-ui.zip` | Lab 1 已完成，保留待改善 UI | 48 通過 |
-| `lab3-rpa.zip` | 已改善 UI，但 RPA 保留故障 | 48 通過 |
-| `instructor-solution.zip` | 完成版，僅供講師 | 48 通過 |
+| `lab1-start` | 講師驗證起始狀態；學員正常開場直接 clone | 19 通過 |
+| `lab1-review` | Coding 卡關救援；快捷已完成，附 coding.diff | 19 通過 |
+| `lab1-tests` | Review 卡關救援；附已確認問題，尚未補測試 | 19 通過 |
+| `lab2-ui` | Lab 1 已完成，保留待改善 UI | 48 通過 |
+| `lab3-rpa` | 已改善 UI，但 RPA 保留故障 | 48 通過 |
+| `instructor-solution` | 完成版，僅供講師示範與驗證 | 48 通過 |
 
-以上測試數是教材內建案例數；學員自己的完成版不必相同。將學員版與解答版放在不同的發放位置，不要要求學員開啟上層資料夾。不能只依賴 Copilot ignore 設定來隔離解答。
+以上測試數是教材內建案例數；學員自己的完成版不必相同。只開啟指定的救援副本，不要要求學員開啟包含所有副本的上層資料夾。副本不含 Git 歷史，review 時使用 `coding.diff` 或編輯器，不要求 `git init` 或 `git add .`。
 
-只在需要時發放下一個救援包，否則完整費率測試可能提前出現在學員可搜尋的其他資料夾。封裝輸出是快照；修改原始檔後需輸出到新的目錄並重新驗證，不覆寫學員作業。
+要預覽完成版，可將上述 `--stage` 改為 `instructor-solution`、`--output` 改為另一個不存在的資料夾，切換至該資料夾後使用原本的 `$Python` 完整路徑執行 `app.py`。切換前先停止自己的伺服器，不覆蓋 repository 根目錄的練習程式。
 
 ## 課前走查
 
 ```powershell
+$Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 & $Python scripts\check_environment.py
 & $Python -m pytest instructor\tests\test_customizations.py -q
-& $Python instructor\validate_materials.py --packages dist\workshop
+& $Python instructor\validate_materials.py --output dist\validation-01
 ```
 
-自動驗證包括起始與完成版測試、已知錯誤被回歸測試攔截、RPA 的兩種故障與修復後行為，以及 UI 的鍵盤操作、窄螢幕、錯誤與重複送出。輸出 `validation.json`；畫面位於完成版 `outputs`，僅為教學資料。
+自動驗證直接從 repository 建立各階段的本機副本，不依賴打包工具。包括起始與完成版測試、已知錯誤被回歸測試攔截、RPA 的兩種故障與修復後行為，以及 UI 的鍵盤操作、窄螢幕、錯誤與重複送出。指定的新資料夾會保留 `validation.json`；畫面位於完成版 `outputs`，僅為教學資料。再次執行須使用不同目錄，不覆寫已有輸出。
 
-`instructor\tests` 另驗證預定義設定的基本欄位、相對連結與各快照的包含範圍；不匯入學員測試，也不改變課堂的基準測試數。
+`instructor\tests` 另驗證 clone 取得的預定義設定、基本欄位、相對連結與救援副本的包含範圍；不匯入學員測試，也不改變課堂的基準測試數。
 
-預錄證據可由同一指令加 `--capture-evidence` 產生至 `docs\evidence`，之後重新封裝到新目錄才會進入學員 ZIP。證據檔不是答案，包含等待失敗的日誌／截圖及零延遲錯誤摘要。
+預錄證據可由同一指令加 `--capture-evidence` 產生至 `docs\evidence`，經審閱並納入 repository 後隨後續 clone 取得，不需重新封裝。證據檔不是答案，包含等待失敗的日誌／截圖及零延遲錯誤摘要。
 
 請仍用實際教室網路、VS Code、Copilot 帳號和學員電腦進行至少一次人工試教。自動驗證不保證模型回覆速度、權限政策或 90 分鐘的人工操作配時。
 
@@ -131,7 +138,7 @@ UI 評量以任務完成與錯誤預防為主，不評「好不好看」的主�
 - `postal-test-design`、`postal-rpa-diagnosis` 是手動啟用的 skills，範例不包含已知缺陷解答或完整測試答案。
 - `.prompt.md` 僅用於支援的 Local Chat。Agent Host 不載入 prompt files，改用 custom agent 或 skill，不要求變更組織政策。
 
-請區分「檔案存在」「設定被發現」「實際載入」「回覆遵守」四件事。教材自動驗證只能涵蓋檔案與封裝；不能取代 VS Code / Copilot 的互動確認。文字指令與工具清單也不是安全沙箱。
+請區分「檔案存在」「設定被發現」「實際載入」「回覆遵守」四件事。教材自動驗證只能涵蓋檔案與程式行為；不能取代 VS Code / Copilot 的互動確認。文字指令與工具清單也不是安全沙箱。
 
 參考成果：一條精簡 AGENTS.md 規則、一個保留唯讀工具範圍的新 agent、一個新增欄位的 skill 模板，或一個適用目前 session 的 prompt。未操作或使用手動附加替代者照實記錄，不影響三個 Lab 的完成判定。
 

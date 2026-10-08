@@ -1,12 +1,9 @@
-"""Export clean workshop packages without placing answers in student workspaces."""
+"""Create an optional local checkpoint for instructor-led rescue or validation."""
 
 import argparse
 import difflib
-import hashlib
-import json
 import shutil
 from pathlib import Path
-from zipfile import ZIP_DEFLATED, ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGES = ("lab1-start", "lab1-review", "lab1-tests", "lab2-ui", "lab3-rpa", "instructor-solution")
@@ -30,12 +27,16 @@ def copy_file(source: Path, destination: Path) -> None:
 
 def add_express(path: Path, before: str, after: str) -> None:
     text = path.read_text(encoding="utf-8")
+    if text.count(after) == 1:
+        return
     if text.count(before) != 1:
         raise ValueError(f"Expected one checkpoint marker in {path}")
     path.write_text(text.replace(before, after), encoding="utf-8")
 
 
-def export_stage(stage: str, destination: Path) -> None:
+def create_checkpoint(stage: str, destination: Path) -> None:
+    if stage not in STAGES:
+        raise ValueError(f"Unknown checkpoint: {stage}")
     destination.mkdir(parents=True, exist_ok=False)
     for name in STUDENT_FILES:
         copy_file(ROOT / name, destination / name)
@@ -43,7 +44,7 @@ def export_stage(stage: str, destination: Path) -> None:
         for source in (ROOT / name).rglob("*"):
             if source.is_file() and "__pycache__" not in source.parts and source.suffix != ".pyc":
                 copy_file(source, destination / source.relative_to(ROOT))
-    copy_file(ROOT / "docs" / "student-readme.md", destination / "README.md")
+    copy_file(ROOT / "README.md", destination / "README.md")
     if stage != "lab1-start":
         add_express(
             destination / "shipping.py",
@@ -82,24 +83,14 @@ def export_stage(stage: str, destination: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "dist")
+    parser.add_argument("--stage", choices=STAGES, required=True)
+    parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     output = args.output.resolve()
     if output.exists():
         parser.error(f"{output} already exists; choose a new directory to protect your work")
-    output.mkdir(parents=True)
-    manifest = {}
-    for stage in STAGES:
-        destination = output / stage
-        export_stage(stage, destination)
-        archive = output / f"{stage}.zip"
-        with ZipFile(archive, "w", ZIP_DEFLATED) as bundle:
-            for path in sorted(destination.rglob("*")):
-                if path.is_file():
-                    bundle.write(path, path.relative_to(output))
-        manifest[archive.name] = hashlib.sha256(archive.read_bytes()).hexdigest()
-        print(f"Created {archive}")
-    (output / "SHA256.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    create_checkpoint(args.stage, output)
+    print(f"Created local checkpoint: {output}")
     return 0
 
 

@@ -9,14 +9,17 @@
 
 若網路或政策不允許安裝，請先交由 IT 協助，不要關閉憑證檢查、代理安全設定或防護軟體。
 
-## 2. 解壓學員教材
+## 2. Clone repository 並安裝相依套件
 
-解壓 `lab1-start.zip` 至短路徑，例如 `C:\Workshop`，得到 `C:\Workshop\lab1-start`。**只開啟此資料夾，不要開啟所有教材的父資料夾。**
+直接 clone repository 至短路徑，例如 `C:\Workshop\post-ghcp-workshop`，不需先打包或取得 ZIP。**VS Code 只開啟此 repository 資料夾，不要開啟包含其他作業或救援副本的父資料夾。** 若同名資料夾已存在，請選新的目的地，勿覆蓋原作業。
 
 在 VS Code 的 PowerShell 終端機：
 
 ```powershell
-Set-Location C:\Workshop\lab1-start
+New-Item -ItemType Directory -Force C:\Workshop | Out-Null
+Set-Location C:\Workshop
+git clone https://github.com/Kenblair1226/post-ghcp-workshop.git
+Set-Location .\post-ghcp-workshop
 python --version
 python -m venv .venv
 $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
@@ -26,7 +29,9 @@ $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 & $Python -m pytest -q
 ```
 
-環境檢查應顯示 `PASS`，起始測試應為 **19 passed**。Chromium 下載需要時間，務必課前完成。`requirements.txt` 是直接相依套件版本；`requirements-lock.txt` 是本教材驗證時完整鎖定的安裝清單。
+環境檢查應顯示 `PASS`，未修改的 Lab 1 起始測試應為 **19 passed**；已有練習修改時數量可能不同。Chromium 下載需要時間，務必課前完成。`requirements.txt` 是直接相依套件版本；`requirements-lock.txt` 是本教材驗證時完整鎖定的安裝清單。
+
+`instructor/` 隨 clone 保留，但包含講師解答。學員與 Copilot 不讀取、搜尋或附加此目錄，也不從其他救援副本或 `dist/` 找答案；依 `AGENTS.md` 限定每次 Lab 的工作範圍。這是操作規範，不是技術隔離。
 
 若 `python` 不存在，使用 IT 提供的 Python 執行檔完整路徑，例如 `& "C:\Tools\Python\python.exe" -m venv .venv`。不要求使用 `py` launcher，也不執行 `Activate.ps1`，因此不需變更 PowerShell 執行原則。
 
@@ -66,37 +71,37 @@ Invoke-RestMethod http://127.0.0.1:5050/health
 
 確認能選取或附加專案檔案。不同版本的 VS Code／Copilot UI 名稱可能不同：分析時選可唯讀詢問的模式；需要編修時使用 Agent 或目前版本提供的編修功能。審閱終端機指令與權限提示，不要盲目允許任意命令。
 
-## 5. 建立本機差異基準
+## 5. 確認 Git 差異基準
 
-僅在剛解壓、尚未修改的學員資料夾執行一次：
+clone 已包含 Git 歷史與基準，不需 `git init`、`git add .` 或先建立 commit。在 repository 根目錄：
 
 ```powershell
-git init
-git add .
+git --no-pager status --short
+git --no-pager diff
 ```
 
-這會將起始內容放入暫存區作為比較基準，不需要 commit、Git 身分設定或遠端 repository。之後用 `git --no-pager diff` 查看本次修改。**課中不要再次 `git add .`，也不要要求 Copilot commit、reset 或清理工作目錄。** 新增的測試檔用編輯器直接審閱。
+剛 clone 且尚未修改時應無差異；之後用 `git --no-pager diff` 查看本次修改。**課中不要 `git add .`，也不要要求 Copilot commit、reset 或清理工作目錄。** 新增的測試檔會列在 status，內容用編輯器直接審閱。
 
 ## 選做功能的準備
 
-教材已包含 `AGENTS.md` 與 `.github` 內的 agents、skills、prompts 及測試指引，不必另外安裝。請不要在解壓或複製教材時漏掉 `.github` 資料夾。
+clone 已包含 `AGENTS.md` 與 `.github` 內的 agents、skills、prompts 及測試指引，不必另外安裝。若使用講師提供的救援副本，請不要在複製時漏掉 `.github` 資料夾。
 
 必做 Lab 不依賴選做功能。若要操作，先依 [選做手冊](optional-customization.md) 確認目前 Chat session 的支援範圍與設定發現情況；不為了選做題更改組織政策或開放額外工具。
 
 ## 切換救援快照
 
-講師會提供 `lab1-review`、`lab1-tests`、`lab2-ui` 或 `lab3-rpa`。先將自己的修改存檔，停止自己啟動的伺服器，再把快照解壓到 `C:\Workshop` 下的另一個資料夾；不要覆蓋原本作業。
+正常練習不需切換。卡關時，講師可按需建立 `lab1-review`、`lab1-tests`、`lab2-ui` 或 `lab3-rpa` 獨立資料夾。先將自己的修改存檔，停止自己啟動的伺服器，再把指定副本放到 `C:\Workshop` 下的另一個資料夾；不要覆蓋原本作業，也不需 ZIP。
 
 以 `lab2-ui` 為例，在新開的 VS Code 終端機：
 
 ```powershell
 Set-Location C:\Workshop\lab2-ui
-$Python = (Resolve-Path ..\lab1-start\.venv\Scripts\python.exe).Path
+$Python = (Resolve-Path ..\post-ghcp-workshop\.venv\Scripts\python.exe).Path
 & $Python -m pytest -q
 & $Python app.py
 ```
 
-各快照共用同一個原始虛擬環境，不需重新下載套件。`$Python` 只在目前終端機有效，每個新終端機都要重新設定。若自行採用其他解壓位置，將上述路徑改為實際位置。
+各副本共用原 repository 的虛擬環境，不需重新下載套件。`$Python` 只在目前終端機有效，每個新終端機都要重新設定。若自行採用其他位置，將上述路徑改為實際位置。救援副本不含 `.git`，不能直接使用 repository 的 diff；review 副本可讀取 `coding.diff`，其他變更用編輯器審閱。
 
 ## 常見問題
 

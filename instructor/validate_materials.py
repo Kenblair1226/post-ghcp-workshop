@@ -1,8 +1,7 @@
-"""Validate exported teaching packages without altering learner source files."""
+"""Validate repository materials in local copies without altering learner source files."""
 
 import argparse
 from contextlib import contextmanager
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -12,13 +11,12 @@ import sys
 import time
 from urllib.request import urlopen
 import xml.etree.ElementTree as ET
-from zipfile import ZipFile
 
 from playwright.sync_api import expect, sync_playwright
+from checkpoints import STAGES, create_checkpoint
 
 ROOT = Path(__file__).resolve().parents[1]
 ENV = {**os.environ, "PYTHONUTF8": "1"}
-STAGES = ("lab1-start", "lab1-review", "lab1-tests", "lab2-ui", "lab3-rpa", "instructor-solution")
 
 
 def run(stage: Path, *args: str, expected_code: int = 0) -> subprocess.CompletedProcess:
@@ -136,43 +134,25 @@ def check_ui(stage: Path, origin: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--packages", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--capture-evidence", action="store_true")
     args = parser.parse_args()
-    packages = args.packages.resolve()
+    output_dir = args.output.resolve()
+    if output_dir.exists():
+        parser.error(f"{output_dir} already exists; choose a new directory to protect your work")
+    output_dir.mkdir(parents=True)
     report = {}
-    checksums = read_json(packages / "SHA256.json")
     for stage_name in STAGES:
-        stage = packages / stage_name
+        stage = output_dir / stage_name
+        create_checkpoint(stage_name, stage)
         (stage / "outputs").mkdir(exist_ok=True)
         result = run(stage, "-m", "pytest", "-q")
         report[stage_name] = result.stdout.strip()
-        archive_path = packages / f"{stage_name}.zip"
-        assert hashlib.sha256(archive_path.read_bytes()).hexdigest() == checksums[archive_path.name]
-        with ZipFile(archive_path) as archive:
-            names = archive.namelist()
-            for name in names:
-                assert archive.read(name) == (packages / name).read_bytes()
-            required_customizations = (
-                "AGENTS.md", ".github/copilot-instructions.md", "docs/optional-customization.md",
-                ".github/agents/postal-reviewer.agent.md",
-                ".github/agents/postal-rpa-diagnostician.agent.md",
-                ".github/skills/postal-test-design/SKILL.md",
-                ".github/skills/postal-test-design/test-matrix.md",
-                ".github/skills/postal-rpa-diagnosis/SKILL.md",
-                ".github/skills/postal-rpa-diagnosis/evidence-template.md",
-                ".github/prompts/postal-review.prompt.md",
-                ".github/prompts/postal-test-plan.prompt.md",
-                ".github/prompts/postal-rpa.prompt.md",
-                ".github/instructions/tests.instructions.md",
-            )
-            assert {f"{stage_name}/{name}" for name in required_customizations} <= set(names)
-            assert not any("/instructor/" in name or "/.venv/" in name for name in names)
-            if stage_name.startswith("lab1-"):
-                assert not any(name.endswith("test_shipping_regression.py") for name in names)
-        print(f"PASS unit tests and package isolation: {stage_name}")
+        assert not (stage / "instructor").exists()
+        assert not (stage / ".venv").exists()
+        print(f"PASS unit tests in local checkpoint: {stage_name}")
 
-    review = packages / "lab1-review"
+    review = output_dir / "lab1-review"
     xml_path = review / "outputs" / "regression.xml"
     run(
         review, "-m", "pytest", "-q", "-c", str(review / "pytest.ini"),
@@ -185,7 +165,7 @@ def main() -> int:
     report["regression_proof"] = "Six assertion failures on the known-defective review checkpoint."
     print("PASS regression tests detect the six expected failures")
 
-    starter = packages / "lab1-start"
+    starter = output_dir / "lab1-start"
     with server(starter) as origin:
         failure = run(
             starter, "-m", "rpa.cli", "--base-url", origin,
@@ -217,7 +197,7 @@ def main() -> int:
     report["starter_rpa"] = "Loading failure and incorrect-column summary reproduced."
     print("PASS both intentionally broken RPA scenarios reproduced")
 
-    solution = packages / "instructor-solution"
+    solution = output_dir / "instructor-solution"
     expected = read_json(solution / "fixtures" / "expected_summary.json")
     with server(solution) as origin:
         for delay_ms in (1200, 1800):
@@ -240,7 +220,7 @@ def main() -> int:
         check_ui(solution, origin)
     report["solution_rpa"] = "Both delays match fixtures; timeout and missing ID fail explicitly."
     report["solution_ui"] = "Keyboard, mobile, themes, stale results, validation, duplicate submits and recovery passed."
-    (packages / "validation.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    (output_dir / "validation.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     print("PASS solution RPA and UI; validation.json written")
     return 0
 

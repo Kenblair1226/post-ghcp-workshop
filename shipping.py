@@ -1,4 +1,4 @@
-SERVICE_FEES = {"standard": 0, "registered": 20}
+SERVICE_FEES = {"standard": 0, "registered": 20, "express": 30}
 
 
 def calculate_fee(weight_grams: int, service: str) -> int:

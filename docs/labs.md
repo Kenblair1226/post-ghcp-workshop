@@ -4,6 +4,8 @@
 
 所有命令均在目前教材資料夾執行，`$Python` 與兩個終端機的設定見 `setup.md`。**不將自己的程式、日誌或截圖上傳到未經組織核可的外部服務。**
 
+學員直接 clone repository 後開始。`instructor/` 含講師解答，學員與 Copilot 不讀取、搜尋或附加此目錄，也不從其他救援副本或 `dist/` 找答案。
+
 ## 開場
 
 1. 終端機 A 啟動 `& $Python app.py`，開啟 `http://127.0.0.1:5050`。
@@ -12,7 +14,7 @@
 
 ## Lab 1｜Coding → Code Review → 補 Test Case（45 分鐘）
 
-起點：`lab1-start`。全程延續自己剛修改的功能，不需切換三個專案。
+起點：clone 後的 repository 根目錄（Lab 1 起始程式）。全程延續自己剛修改的功能，不需產生快照或切換三個專案。
 
 ### A. Coding
 

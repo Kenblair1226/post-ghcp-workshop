@@ -153,6 +153,20 @@ def main() -> int:
             names = archive.namelist()
             for name in names:
                 assert archive.read(name) == (packages / name).read_bytes()
+            required_customizations = (
+                "AGENTS.md", ".github/copilot-instructions.md", "docs/optional-customization.md",
+                ".github/agents/postal-reviewer.agent.md",
+                ".github/agents/postal-rpa-diagnostician.agent.md",
+                ".github/skills/postal-test-design/SKILL.md",
+                ".github/skills/postal-test-design/test-matrix.md",
+                ".github/skills/postal-rpa-diagnosis/SKILL.md",
+                ".github/skills/postal-rpa-diagnosis/evidence-template.md",
+                ".github/prompts/postal-review.prompt.md",
+                ".github/prompts/postal-test-plan.prompt.md",
+                ".github/prompts/postal-rpa.prompt.md",
+                ".github/instructions/tests.instructions.md",
+            )
+            assert {f"{stage_name}/{name}" for name in required_customizations} <= set(names)
             assert not any("/instructor/" in name or "/.venv/" in name for name in names)
             if stage_name.startswith("lab1-"):
                 assert not any(name.endswith("test_shipping_regression.py") for name in names)

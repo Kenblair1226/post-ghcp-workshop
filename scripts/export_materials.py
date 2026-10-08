@@ -10,10 +10,14 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGES = ("lab1-start", "lab1-review", "lab1-tests", "lab2-ui", "lab3-rpa", "instructor-solution")
-STUDENT_DIRS = ("templates", "static", "rpa", "fixtures", "tests", "docs/evidence")
+STUDENT_DIRS = (
+    "templates", "static", "rpa", "fixtures", "tests", "docs/evidence",
+    ".github/agents", ".github/skills", ".github/prompts", ".github/instructions",
+)
 STUDENT_FILES = (
     ".gitignore", "app.py", "shipping.py", "requirements.txt", "requirements-lock.txt", "pytest.ini",
-    "docs/setup.md", "docs/rules.md", "docs/labs.md", "docs/worksheet.md",
+    "AGENTS.md", ".github/copilot-instructions.md",
+    "docs/setup.md", "docs/rules.md", "docs/labs.md", "docs/worksheet.md", "docs/optional-customization.md",
     "scripts/check_environment.py", "scripts/verify_summary.py",
 )
 SOLUTION = ROOT / "instructor" / "solution"

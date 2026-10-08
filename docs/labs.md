@@ -4,7 +4,7 @@
 
 所有命令均在目前教材資料夾執行，`$Python` 與兩個終端機的設定見 `setup.md`。**不將自己的程式、日誌或截圖上傳到未經組織核可的外部服務。**
 
-## 00:00–00:05｜開場
+## 開場
 
 1. 終端機 A 啟動 `& $Python app.py`，開啟 `http://127.0.0.1:5050`。
 2. 終端機 B 執行 `& $Python -m pytest -q`，起始版本應為 19 passed。
@@ -14,7 +14,7 @@
 
 起點：`lab1-start`。全程延續自己剛修改的功能，不需切換三個專案。
 
-### A. Coding（18 分鐘）
+### A. Coding
 
 **目標：** 新增快捷服務，讓 1,000 公克快捷報價為 90 元。
 
@@ -45,9 +45,9 @@ Invoke-RestMethod http://127.0.0.1:5050/api/quote -Method Post -ContentType "app
 
 **檢查點：** 回傳 `fee: 90`；一般與掛號仍正常；說明哪個檔案負責顯示、哪個檔案負責計算。此時不要求完整邊界覆蓋。
 
-卡關：先附加指定檔案，請 Copilot 縮小修改範圍。超過 2 分鐘仍無進展，由講師提供 `lab1-review` 接續；其中 `coding.diff` 可當作待 review 的差異。
+卡關：先附加指定檔案，請 Copilot 縮小修改範圍。仍無進展時，由講師提供 `lab1-review` 接續；其中 `coding.diff` 可當作待 review 的差異。
 
-### B. Code Review（12 分鐘）
+### B. Code Review
 
 **目標：** 檢查剛完成的功能與相關既有路徑，取得可驗證的結論。
 
@@ -80,7 +80,7 @@ Invoke-RestMethod http://127.0.0.1:5050/api/quote -Method Post -ContentType "app
 
 若 Coding 已經修好所有問題，講師可提供獨立的 review 練習副本，保留自己的成果不動。
 
-### C. 補 Test Case 與修正（15 分鐘）
+### C. 補 Test Case 與修正
 
 **目標：** 將 review 發現變成測試，不只追求全綠。
 
@@ -140,7 +140,7 @@ PowerShell 對 HTTP 400 顯示錯誤是預期現象；檢查訊息有明確拒�
 不得改變費率需求；完成後列出需要我在瀏覽器人工確認的項目。
 ```
 
-**五分鐘人工驗收：**
+**人工驗收：**
 
 | 操作 | 預期 |
 |---|---|
@@ -163,7 +163,7 @@ PowerShell 對 HTTP 400 顯示錯誤是預期現象；檢查訊息有明確拒�
 
 起點：自己的專案，或 `lab3-rpa`。只改 `rpa\track_mail.py`，不修改查詢頁、fixtures 或預期結果。
 
-### 1. 重現與保留證據（4 分鐘）
+### 1. 重現與保留證據
 
 確認本機伺服器仍在執行。終端機 B：
 
@@ -186,7 +186,7 @@ Get-Content -Encoding utf8 outputs\delay.json
 
 通常腳本能結束，但比對會失敗。若機器忙碌使零延遲仍未在固定等待內完成，保留此證據並先修等待問題，再查資料定位；不要把零延遲當成保證或修復。
 
-### 2. 定位與修正（8 分鐘）
+### 2. 定位與修正
 
 附加 `rpa\track_mail.py`、日誌、`templates\tracking.html`、`static\tracking.js` 與相關 fixture：
 
@@ -207,7 +207,7 @@ Get-Content -Encoding utf8 outputs\delay.json
 不要修改查詢頁、fixtures、預期結果或 requirements。
 ```
 
-### 3. 成功與失敗驗收（6 分鐘）
+### 3. 成功與失敗驗收
 
 不同延遲都要輸出相同的正確三筆摘要：
 
@@ -234,6 +234,10 @@ Get-Content -Encoding utf8 outputs\missing.json
 
 **檢查點：** 能說明根因與修正，而不是只說「Copilot 幫我改好了」。無法使用瀏覽器者分析 `docs\evidence`，並在作業單標記尚未執行驗收。
 
-## 01:23–01:30｜收尾
+## 選做｜Copilot 客製化
 
-保留四分鐘緩衝、三分鐘展示。完成 `worksheet.md`，分享一項 review 證據、一個抓到錯誤的測試，以及一個 RPA 根因。不需提交真實資料、不需推送 GitHub。
+已完成必做內容且還有時間的學員，可前往 [選做手冊](optional-customization.md)，操作 `AGENTS.md`、預先定義的 custom agents、skills 與 prompt files。可擇一或課後完成，不延長原本課程，也不影響三個 Lab 的完成判定。
+
+## 收尾
+
+完成 `worksheet.md`，分享一項 review 證據、一個抓到錯誤的測試，以及一個 RPA 根因。不需提交真實資料、不需推送 GitHub。

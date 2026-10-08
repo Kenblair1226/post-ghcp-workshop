@@ -77,6 +77,12 @@ git add .
 
 這會將起始內容放入暫存區作為比較基準，不需要 commit、Git 身分設定或遠端 repository。之後用 `git --no-pager diff` 查看本次修改。**課中不要再次 `git add .`，也不要要求 Copilot commit、reset 或清理工作目錄。** 新增的測試檔用編輯器直接審閱。
 
+## 選做功能的準備
+
+教材已包含 `AGENTS.md` 與 `.github` 內的 agents、skills、prompts 及測試指引，不必另外安裝。請不要在解壓或複製教材時漏掉 `.github` 資料夾。
+
+必做 Lab 不依賴選做功能。若要操作，先依 [選做手冊](optional-customization.md) 確認目前 Chat session 的支援範圍與設定發現情況；不為了選做題更改組織政策或開放額外工具。
+
 ## 切換救援快照
 
 講師會提供 `lab1-review`、`lab1-tests`、`lab2-ui` 或 `lab3-rpa`。先將自己的修改存檔，停止自己啟動的伺服器，再把快照解壓到 `C:\Workshop` 下的另一個資料夾；不要覆蓋原本作業。

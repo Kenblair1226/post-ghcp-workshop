@@ -6,7 +6,9 @@
 
 ## 快速開始
 
-先安裝 Git、VS Code、Python 3.11 以上，並確認 Copilot 權限。在 PowerShell 執行：
+先安裝 Git、VS Code、Python 3.11 以上，並確認 Copilot 權限。依作業系統選用以下指令。
+
+**Windows（PowerShell）**
 
 ```powershell
 New-Item -ItemType Directory -Force C:\Workshop | Out-Null
@@ -22,7 +24,23 @@ $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 & $Python app.py
 ```
 
-在 VS Code 開啟 `C:\Workshop\post-ghcp-workshop`，瀏覽器開啟 `http://127.0.0.1:5050`。伺服器保持在終端機 A 執行；在終端機 B 重新設定 `$Python` 後執行測試與 RPA。完整安裝、interpreter 選擇與疑難排解見 [環境手冊](docs/setup.md)。
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+mkdir -p "$HOME/Workshop"
+cd "$HOME/Workshop" || exit
+git clone https://github.com/Kenblair1226/post-ghcp-workshop.git
+cd post-ghcp-workshop || exit
+python3 -m venv .venv
+PYTHON="$(pwd)/.venv/bin/python"
+"$PYTHON" -m pip install -r requirements-lock.txt
+"$PYTHON" -m playwright install chromium
+"$PYTHON" scripts/check_environment.py
+"$PYTHON" -m pytest -q
+"$PYTHON" app.py
+```
+
+在 VS Code 開啟 `C:\Workshop\post-ghcp-workshop`（Windows）或 `~/Workshop/post-ghcp-workshop`（Linux／macOS），瀏覽器開啟 `http://127.0.0.1:5050`。伺服器保持在終端機 A 執行；在終端機 B 重新設定 `$Python`（PowerShell）或 `PYTHON`（Bash／Zsh）後執行測試與 RPA。完整安裝、interpreter 選擇與疑難排解見 [環境手冊](docs/setup.md)。
 
 若資料夾已存在，請改用新的 clone 目的地，不覆蓋原作業。clone 已包含 Git 歷史，不需要 `git init` 或 `git add .` 建立基準；以 `git --no-pager diff` 審閱自己的修改。
 
@@ -42,13 +60,24 @@ $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 
 ## 常用指令
 
-每個新的 PowerShell 終端機先設定 interpreter：
+每個新終端機先在 repository 根目錄設定 interpreter。
+
+**Windows（PowerShell）**
 
 ```powershell
 $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 & $Python -m pytest -q
 git --no-pager diff
 & $Python -m rpa.cli --headed
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+PYTHON="$(pwd)/.venv/bin/python"
+"$PYTHON" -m pytest -q
+git --no-pager diff
+"$PYTHON" -m rpa.cli --headed
 ```
 
 起始 RPA 的故障是 Lab 3 的練習，不是安裝失敗。修改 Python 後，停止並重啟自己啟動的伺服器；不要終止他人的程序。

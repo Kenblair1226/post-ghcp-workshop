@@ -16,9 +16,18 @@
 
 在 repository 根目錄執行：
 
+**Windows（PowerShell）**
+
 ```powershell
 $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 & $Python instructor\checkpoints.py --stage lab2-ui --output C:\Workshop\lab2-ui
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+PYTHON="$(pwd)/.venv/bin/python"
+"$PYTHON" instructor/checkpoints.py --stage lab2-ui --output "$HOME/Workshop/lab2-ui"
 ```
 
 工具以目前工作目錄中的教材建立獨立資料夾，包含 README、規格、操作手冊、作業單、程式、測試、`AGENTS.md` 與預定義客製化設定；不複製 `instructor`、虛擬環境、`.git` 或其他驗證輸出。它不會還原已被修改的起始程式，講師應以未做練習的乾淨 clone 建立標準救援副本與驗證教材。目的地必須不存在，避免覆寫作業。
@@ -34,15 +43,26 @@ $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 
 以上測試數是教材內建案例數；學員自己的完成版不必相同。只開啟指定的救援副本，不要要求學員開啟包含所有副本的上層資料夾。副本不含 Git 歷史，review 時使用 `coding.diff` 或編輯器，不要求 `git init` 或 `git add .`。
 
-要預覽完成版，可將上述 `--stage` 改為 `instructor-solution`、`--output` 改為另一個不存在的資料夾，切換至該資料夾後使用原本的 `$Python` 完整路徑執行 `app.py`。切換前先停止自己的伺服器，不覆蓋 repository 根目錄的練習程式。
+要預覽完成版，可將上述 `--stage` 改為 `instructor-solution`、`--output` 改為另一個不存在的資料夾，切換至該資料夾後使用原本 interpreter 的完整路徑：PowerShell 執行 `& $Python app.py`，Bash／Zsh 執行 `"$PYTHON" app.py`。新終端機的 interpreter 設定與切換資料夾指令見 [環境手冊](../docs/setup.md#切換救援快照)。切換前先停止自己的伺服器，不覆蓋 repository 根目錄的練習程式。
 
 ## 課前走查
+
+**Windows（PowerShell）**
 
 ```powershell
 $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 & $Python scripts\check_environment.py
 & $Python -m pytest instructor\tests\test_customizations.py -q
 & $Python instructor\validate_materials.py --output dist\validation-01
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+PYTHON="$(pwd)/.venv/bin/python"
+"$PYTHON" scripts/check_environment.py
+"$PYTHON" -m pytest instructor/tests/test_customizations.py -q
+"$PYTHON" instructor/validate_materials.py --output dist/validation-01
 ```
 
 自動驗證直接從 repository 建立各階段的本機副本，不依賴打包工具。包括起始與完成版測試、已知錯誤被回歸測試攔截、RPA 的兩種故障與修復後行為，以及 UI 的鍵盤操作、窄螢幕、錯誤與重複送出。指定的新資料夾會保留 `validation.json`；畫面位於完成版 `outputs`，僅為教學資料。再次執行須使用不同目錄，不覆寫已有輸出。

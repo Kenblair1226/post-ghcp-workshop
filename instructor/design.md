@@ -23,7 +23,9 @@
 | 成果紀錄 | [學員作業單](../docs/worksheet.md) |
 | 講師帶課 | [講師手冊、解答與救援說明](guide.md) |
 
-講師在此 repository 使用 PowerShell：
+講師在此 repository 根目錄依作業系統選用指令。
+
+**Windows（PowerShell）**
 
 ```powershell
 python -m venv .venv
@@ -34,14 +36,33 @@ $Python = (Resolve-Path .\.venv\Scripts\python.exe).Path
 & $Python -m pytest -q
 ```
 
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+python3 -m venv .venv
+PYTHON="$(pwd)/.venv/bin/python"
+"$PYTHON" -m pip install -r requirements-lock.txt
+"$PYTHON" -m playwright install chromium
+"$PYTHON" scripts/check_environment.py
+"$PYTHON" -m pytest -q
+```
+
 提供 repository 網址與環境手冊即可，不製作或發放學員 ZIP。需要救援時，講師才依講師手冊建立單一獨立副本，不覆寫學員作業。
 
-若要預覽起始頁：`& $Python app.py`，開啟 `http://127.0.0.1:5050`。完成版須先建立獨立副本，操作見講師手冊；不要將解答覆蓋至根目錄。
+若要預覽起始頁：PowerShell 用 `& $Python app.py`，Bash／Zsh 用 `"$PYTHON" app.py`，開啟 `http://127.0.0.1:5050`。完成版須先建立獨立副本，操作見講師手冊；不要將解答覆蓋至根目錄。
 
 自動驗證整套教材：
 
+**Windows（PowerShell）**
+
 ```powershell
 & $Python instructor\validate_materials.py --output dist\validation-01
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+"$PYTHON" instructor/validate_materials.py --output dist/validation-01
 ```
 
 驗證直接從 repository 建立本機驗證副本，不依賴封裝檔；使用暫時的本機伺服器與 Chromium，結束後關閉，輸出存於指定的新資料夾。人工 90 分鐘試教與學員環境確認仍需另做，不能由自動驗證替代。
@@ -98,7 +119,7 @@ RPA Lab 教的是「從日誌、畫面與程式找根因」的方法，不是 Ui
 - 實際開啟本機首頁、執行基準測試及瀏覽器啟動檢查，不能只確認安裝指令成功。
 - 確認課堂網路可使用 Copilot；不要到現場才申請授權、下載瀏覽器或處理代理伺服器設定。
 
-教材製作時須提供 Windows PowerShell 操作指令，直接使用虛擬環境內的 Python，避免要求學員變更系統執行原則。
+教材製作時須同時提供 Windows PowerShell 與 Linux／macOS Bash／Zsh 操作指令，直接使用各平台虛擬環境內的 Python，避免要求學員變更系統執行原則。跨平台指令不代表已在該平台實測；講師須依環境手冊在實際授課環境確認。
 
 ### 講師須在課前完成
 

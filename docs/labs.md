@@ -2,14 +2,14 @@
 
 總長 90 分鐘。每次交給 Copilot 的任務都包含「目標、檔案、限制、驗收方式」。以下提示詞可貼入 Chat；必要時使用檔案附加功能，不假定 Copilot 自動取得終端機或瀏覽器內容。
 
-所有命令均在目前教材資料夾執行，`$Python` 與兩個終端機的設定見 `setup.md`。**不將自己的程式、日誌或截圖上傳到未經組織核可的外部服務。**
+所有命令均在目前教材資料夾執行，PowerShell 的 `$Python`、Bash／Zsh 的 `PYTHON` 與兩個終端機的設定見 `setup.md`。依作業系統選用對應區塊，`bash` 區塊同時適用 Linux／macOS 的 Bash 與 Zsh。**不將自己的程式、日誌或截圖上傳到未經組織核可的外部服務。**
 
 學員直接 clone repository 後開始。`instructor/` 含講師解答，學員與 Copilot 不讀取、搜尋或附加此目錄，也不從其他救援副本或 `dist/` 找答案。
 
 ## 開場
 
-1. 終端機 A 啟動 `& $Python app.py`，開啟 `http://127.0.0.1:5050`。
-2. 終端機 B 執行 `& $Python -m pytest -q`，起始版本應為 19 passed。
+1. 終端機 A 啟動伺服器：PowerShell 用 `& $Python app.py`；Bash／Zsh 用 `"$PYTHON" app.py`。開啟 `http://127.0.0.1:5050`。
+2. 終端機 B 執行測試：PowerShell 用 `& $Python -m pytest -q`；Bash／Zsh 用 `"$PYTHON" -m pytest -q`。起始版本應為 19 passed。
 3. 確認 VS Code 只開啟目前學員資料夾，讀取 `rules.md`。
 
 ## Lab 1｜Coding → Code Review → 補 Test Case（45 分鐘）
@@ -34,15 +34,34 @@
 
 審閱差異：
 
+**Windows（PowerShell）**
+
 ```powershell
 git --no-pager diff -- shipping.py app.py templates static
 & $Python -m pytest -q
 ```
 
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+git --no-pager diff -- shipping.py app.py templates static
+"$PYTHON" -m pytest -q
+```
+
 重啟自己的 Flask 伺服器，重新整理網頁，測試三種服務。另直接呼叫 API：
+
+**Windows（PowerShell）**
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:5050/api/quote -Method Post -ContentType "application/json" -Body '{"weight_grams":1000,"service":"express"}'
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+curl -sS -i http://127.0.0.1:5050/api/quote \
+  -H "Content-Type: application/json" \
+  --data '{"weight_grams":1000,"service":"express"}'
 ```
 
 **檢查點：** 回傳 `fee: 90`；一般與掛號仍正常；說明哪個檔案負責顯示、哪個檔案負責計算。此時不要求完整邊界覆蓋。
@@ -68,8 +87,16 @@ Invoke-RestMethod http://127.0.0.1:5050/api/quote -Method Post -ContentType "app
 
 不要直接複製結論到作業單。挑一項用終端機重現：
 
+**Windows（PowerShell）**
+
 ```powershell
 & $Python -c "from shipping import calculate_fee; print(calculate_fee(20000, 'standard'))"
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+"$PYTHON" -c "from shipping import calculate_fee; print(calculate_fee(20000, 'standard'))"
 ```
 
 將結果對照需求表，記錄「預期、實際、原因」。若這個輸入已正確，再檢查另一個需求邊界；沒有缺陷時記錄已通過與缺少的測試，不要求硬湊問題。
@@ -97,8 +124,16 @@ Invoke-RestMethod http://127.0.0.1:5050/api/quote -Method Post -ContentType "app
 執行測試，區分實作缺陷與測試寫錯造成的失敗。
 ```
 
+**Windows（PowerShell）**
+
 ```powershell
 & $Python -m pytest tests\test_shipping_regression.py -q
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+"$PYTHON" -m pytest tests/test_shipping_regression.py -q
 ```
 
 查看失敗的輸入與斷言，確認符合 review 發現，再貼：
@@ -109,17 +144,35 @@ Invoke-RestMethod http://127.0.0.1:5050/api/quote -Method Post -ContentType "app
 執行全部測試，說明每個修正對應哪項 review 發現。
 ```
 
+**Windows（PowerShell）**
+
 ```powershell
 & $Python -m pytest -q
 ```
 
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+"$PYTHON" -m pytest -q
+```
+
 重啟伺服器後，直接送出非法重量，應收到 HTTP 400，而非報價：
+
+**Windows（PowerShell）**
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:5050/api/quote -Method Post -ContentType "application/json" -Body '{"weight_grams":0,"service":"standard"}'
 ```
 
-PowerShell 對 HTTP 400 顯示錯誤是預期現象；檢查訊息有明確拒絕重量。學員新增測試數量可不同，不要求與講師相同；要求需求覆蓋與正確斷言。
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+curl -sS -i http://127.0.0.1:5050/api/quote \
+  -H "Content-Type: application/json" \
+  --data '{"weight_grams":0,"service":"standard"}'
+```
+
+PowerShell 對 HTTP 400 顯示錯誤是預期現象；Bash／Zsh 的 `curl -sS -i` 會顯示 HTTP 狀態與回應內容，但不因 HTTP 400 自動回傳非零結束碼。兩者都要檢查 HTTP 400 與明確拒絕重量的訊息，不只看命令是否成功。學員新增測試數量可不同，不要求與講師相同；要求需求覆蓋與正確斷言。
 
 **完成標準：** 功能可用；有 review 證據；至少一個新測試曾抓到錯誤並在修正後通過。若所有缺陷早已修正，由講師協助在獨立錯誤副本執行新測試證明效力，不要刻意破壞自己的正確版本。
 
@@ -155,8 +208,16 @@ PowerShell 對 HTTP 400 顯示錯誤是預期現象；檢查訊息有明確拒�
 
 要觀察「送出中」，可在瀏覽器 DevTools 使用慢速網路模擬，再連按兩次；Network 面板不應出現重複的報價請求。完成後關閉離線／限速設定。
 
+**Windows（PowerShell）**
+
 ```powershell
 & $Python -m pytest -q
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+"$PYTHON" -m pytest -q
 ```
 
 **檢查點：** 說明一項降低操作錯誤的設計；費率測試仍通過。沒有 Copilot 瀏覽器工具也能完成，提供畫面時只用這個教學系統的截圖。
@@ -169,6 +230,8 @@ PowerShell 對 HTTP 400 顯示錯誤是預期現象；檢查訊息有明確拒�
 
 確認本機伺服器仍在執行。終端機 B：
 
+**Windows（PowerShell）**
+
 ```powershell
 New-Item -ItemType Directory -Force outputs | Out-Null
 & $Python -m rpa.cli --headed --output outputs\delay.json 2> outputs\delay.log
@@ -177,13 +240,34 @@ Get-Content outputs\delay.log
 Get-Content -Encoding utf8 outputs\delay.json
 ```
 
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+mkdir -p outputs
+"$PYTHON" -m rpa.cli --headed --output outputs/delay.json 2> outputs/delay.log
+echo "$?"
+cat outputs/delay.log
+cat outputs/delay.json
+```
+
+結束碼要在 RPA 指令後立即讀取：PowerShell 用 `$LASTEXITCODE`，Bash／Zsh 用 `echo "$?"`。不要先執行其他命令，也不要以 `&&` 串接預期失敗後仍需執行的證據讀取步驟。
+
 起始版本預期失敗，結束碼 1，輸出 `ok: false`，並儲存 `outputs\delay.png`。讀日誌，確認是在哪個編號與畫面狀態失敗。
 
 再執行零延遲診斷：
 
+**Windows（PowerShell）**
+
 ```powershell
 & $Python -m rpa.cli --delay-ms 0 --output outputs\fast.json
 & $Python scripts\verify_summary.py outputs\fast.json
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+"$PYTHON" -m rpa.cli --delay-ms 0 --output outputs/fast.json
+"$PYTHON" scripts/verify_summary.py outputs/fast.json
 ```
 
 通常腳本能結束，但比對會失敗。若機器忙碌使零延遲仍未在固定等待內完成，保留此證據並先修等待問題，再查資料定位；不要把零延遲當成保證或修復。
@@ -213,6 +297,8 @@ Get-Content -Encoding utf8 outputs\delay.json
 
 不同延遲都要輸出相同的正確三筆摘要：
 
+**Windows（PowerShell）**
+
 ```powershell
 & $Python -m rpa.cli --delay-ms 1200 --output outputs\normal.json
 & $Python scripts\verify_summary.py outputs\normal.json
@@ -220,7 +306,18 @@ Get-Content -Encoding utf8 outputs\delay.json
 & $Python scripts\verify_summary.py outputs\slow.json
 ```
 
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+"$PYTHON" -m rpa.cli --delay-ms 1200 --output outputs/normal.json
+"$PYTHON" scripts/verify_summary.py outputs/normal.json
+"$PYTHON" -m rpa.cli --delay-ms 1800 --output outputs/slow.json
+"$PYTHON" scripts/verify_summary.py outputs/slow.json
+```
+
 接著故意觸發失敗：
+
+**Windows（PowerShell）**
 
 ```powershell
 & $Python -m rpa.cli --delay-ms 1800 --timeout-ms 200 --output outputs\timeout.json
@@ -230,6 +327,18 @@ Get-Content -Encoding utf8 outputs\timeout.json
 $LASTEXITCODE
 Get-Content -Encoding utf8 outputs\missing.json
 & $Python -m pytest tests\test_summary.py -q
+```
+
+**Linux／macOS（Bash／Zsh）**
+
+```bash
+"$PYTHON" -m rpa.cli --delay-ms 1800 --timeout-ms 200 --output outputs/timeout.json
+echo "$?"
+cat outputs/timeout.json
+"$PYTHON" -m rpa.cli --mail-id MISSING --delay-ms 0 --output outputs/missing.json
+echo "$?"
+cat outputs/missing.json
+"$PYTHON" -m pytest tests/test_summary.py -q
 ```
 
 前兩個 RPA 失敗情境均應結束碼 1、`ok: false`，原因分別是逾時與查無資料。摘要單元測試通過只能證明資料整理，不等於瀏覽器等待與定位正確。

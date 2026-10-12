@@ -52,6 +52,7 @@ PYTHON="$(pwd)/.venv/bin/python"
 | 課中 | [三個 Lab 的步驟與提示詞](docs/labs.md) |
 | 需求判定 | [業務規格與驗收資料](docs/rules.md) |
 | 成果紀錄 | [學員作業單](docs/worksheet.md) |
+| 選做對照 | [各 Lab 的 Prompt 風格與比較方法](docs/prompt-variants.md) |
 | 選做 | [AGENTS.md、custom agents、skills 與 prompts](docs/optional-customization.md) |
 
 依序延續自己的程式，不要求 Copilot 一次完成整場課程。`AGENTS.md` 與 `.github` 的客製化設定已隨 clone 取得，不需另外安裝。
